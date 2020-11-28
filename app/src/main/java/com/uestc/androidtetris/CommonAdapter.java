@@ -20,9 +20,8 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
     Context mContext;
     List<T> mDatas;
 
-    public CommonAdapter(Context context, List<T> mDatas, int mLayoutId)
-    {
-        mInflater = LayoutInflater.from(context);
+    public CommonAdapter(Context context, List<T> mDatas, int mLayoutId) {
+        mInflater = LayoutInflater.from(context);   //获得LayoutInflater对象，用于生成view;
         this.mContext = context;
         this.mDatas = mDatas;
         this.mItemLayoutId = mLayoutId;
@@ -69,6 +68,7 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
     }
 
     @Override
+    /** 根据一个索引（position）获得该位置的对象,这里获取每一个格子中的值 */
     public T getItem(int position) {
         return mDatas.get(position);
     }
@@ -79,22 +79,27 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
     }
 
     @Override
+    /** 要绑定的条目的数量，这里是格子的数量 */
     public int getCount() {
         return mDatas.size();
     }
 
     @Override
+    /** 获取该条目要显示的界面 */
     public View getView(int position, View convertView, ViewGroup parent) {
-        final  ViewHolder viewHolder = getViewHolder(position, convertView, parent);
+        final ViewHolder viewHolder = getViewHolder(position, convertView, parent);
         convert(viewHolder,getItem(position));
         return viewHolder.getConvertView();
     }
+
+    /** 加载格子中的图片 */
     public abstract void convert(ViewHolder helper,T item);
-    public ViewHolder getViewHolder(int position, View convertView, ViewGroup parent)
-    {
+
+    public ViewHolder getViewHolder(int position, View convertView, ViewGroup parent) {
         return ViewHolder.get(mContext,convertView,parent,mItemLayoutId,position);
     }
 
+    /** 存储俄罗斯小方块至对象 */
     public void setmDatas(List<T> mDatas) {
         this.mDatas = mDatas;
     }

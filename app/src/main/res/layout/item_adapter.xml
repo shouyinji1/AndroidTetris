@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--在这里设置单元格的宽高-->
+<!--在这里设置单元格的宽高
+    该文件绘制了俄罗斯方块中的每一个小方块像素
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="24dp"
     android:layout_height="24dp"
