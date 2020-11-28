@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     Random random= new Random();
     Timer timer;
     /** 随机图形index，随机颜色index */
-    int rand,randColor, nextRand,nextRandColor;
+    int randBlock,randColor, nextRandBlock,nextRandColor;
     /** position[1]为y方向位置 */
     int[] position=new int[2];
     int stop = 0;
@@ -83,57 +83,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (msg.what == 0) {    //如果处于等时间间隔下落状态
-                boolean canMove = true;
-
-                //检测是否可以按要求移动
-                position[1]++;
-                for(int i = 3; i>=0; i--) {
-                    int line = i + position[1];
-                    if (line >= 0 && Tetris.shape[rand][i] != 0) {
-                        //如果到底了，或者下面有方块
-                        if (line >= ySize ||
-                                ((allBlock[line] & (leftMath(Tetris.shape[rand][i] ,position[0]))) != 0)) {
-                            canMove = false;
-                            break;
-                        }
-                    }
-                }
-                if (!canMove) {
-                    position[1]--;
-                    for (int i = 3; i >= 0; i--) {
-                        int line = i + position[1];
-                        if (line >= 0 && Tetris.shape[rand][i] != 0) {
-                            for (int j = 0; j < xSize; j++) {
-                                if (((1 << j) & (leftMath(Tetris.shape[rand][i], position[0]))) != 0) {
-                                    blockList.set(line * xSize + j, randColor);
-                                }
-                            }
-                        }
-                    }
+                if (!isCanDown()) {
+                    updateTetrisGameGrid();
                     stopDown();
                 } else {
-                    for (int i = 3; i >= 0; i--) {
-                        int line = i + position[1];
-                        if (line >= 0 && Tetris.shape[rand][i] != 0) {
-                            for (int j = 0; j < xSize; j++) {
-                                if (((1 << j) & (leftMath(Tetris.shape[rand][i], position[0]))) != 0) {
-                                    blockList.set(line * xSize + j, randColor);
-                                }
-                            }
-                        }
-                    }
+                    position[1]++;
+                    updateTetrisGameGrid();
                 }
             }else{
-                for (int i = 3; i >= 0; i--) {
-                    int line = i + position[1];
-                    if (line >= 0 && Tetris.shape[rand][i] != 0) {
-                        for (int j = 0; j < xSize; j++) {
-                            if (((1 << j) & (leftMath(Tetris.shape[rand][i], position[0]))) != 0) {
-                                blockList.set(line * xSize + j, randColor);
-                            }
-                        }
-                    }
-                }
+                updateTetrisGameGrid();
             }
             blockAdapter.setmDatas(blockList);
             blockAdapter.notifyDataSetChanged();
@@ -161,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         initTetrisGrid();
         initNextTetrisGrid();
 
-        Log.i(TAG, rand + "");
+        Log.i(TAG, randBlock + "");
 
         startTimer();
     }
@@ -219,16 +177,16 @@ public class MainActivity extends AppCompatActivity {
                 //左移实际是数字的右移
                 //左移需要判断是否能够左移
                 for (int i=3;i>=0;i--) {
-                    if ((((leftMath(Tetris.shape[rand][i] ,position[0])) >> 1) << 1)
-                            != (leftMath(Tetris.shape[rand][i] ,position[0]))) {
+                    if ((((leftMath(Tetris.shape[randBlock][i] ,position[0])) >> 1) << 1)
+                            != (leftMath(Tetris.shape[randBlock][i] ,position[0]))) {
                         //如果越界了
                         return;
                     }
                 }
                 for (int i=3;i>=0;i--) {
                     int line = i + position[1];
-                    if (line >= 0 && Tetris.shape[rand][i]!=0) {
-                        if ((allBlock[line] & (leftMath(Tetris.shape[rand][i], position[0]) >> 1)) != 0) {
+                    if (line >= 0 && Tetris.shape[randBlock][i]!=0) {
+                        if ((allBlock[line] & (leftMath(Tetris.shape[randBlock][i], position[0]) >> 1)) != 0) {
                             return;
                         }
                     }
@@ -240,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         rotateMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int nextRotate = Tetris.nextShape[rand];
+                int nextRotate = Tetris.nextShape[randBlock];
                 for (int i=3;i>=0;i--) {
                     int line = i + position[1];
                     //检查是否越界
@@ -260,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 }
-                rand = nextRotate;
+                randBlock = nextRotate;
                 handler.sendEmptyMessage(1);
             }
         });
@@ -268,16 +226,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 for (int i=3;i>=0;i--) {
-                    if (((leftMath(Tetris.shape[rand][i], position[0])) << 1) > 0x3ff
-                    ) {
+                    if (((leftMath(Tetris.shape[randBlock][i], position[0])) << 1) > 0x3ff) {
                         //如果越界了
                         return;
                     }
                 }
                 for (int i=3;i>=0;i--) {
                     int line = i + position[1];
-                    if (line >= 0 && Tetris.shape[rand][i]!=0) {
-                        if ((allBlock[line] & (leftMath(Tetris.shape[rand][i], position[0]) << 1)) != 0) {
+                    if (line >= 0 && Tetris.shape[randBlock][i]!=0) {
+                        if ((allBlock[line] & (leftMath(Tetris.shape[randBlock][i], position[0]) << 1)) != 0) {
                             return;
                         }
                     }
@@ -293,10 +250,10 @@ public class MainActivity extends AppCompatActivity {
                 int down=1<<10;
                 for(int i=3;i>=0;i--) {
                     int line = i + position[1];
-                    if (line >= 0 && Tetris.shape[rand][i] != 0) {
+                    if (line >= 0 && Tetris.shape[randBlock][i] != 0) {
                         down = Math.min(down, ySize - line - 1);
                         for (int j=0;j<xSize;j++) {
-                            if (((1 << j)& (leftMath(Tetris.shape[rand][i] ,position[0])))!=0) {
+                            if (((1 << j)& (leftMath(Tetris.shape[randBlock][i] ,position[0])))!=0) {
                                 for(int k=0;k+line<ySize;k++) {
                                     if (blockColor[k + line][j] > 0) {
                                         down = Math.min(down, k-1);
@@ -326,13 +283,13 @@ public class MainActivity extends AppCompatActivity {
     /** 初始化第一个和下一个俄罗斯小方块 */
     private void initTetrisBlock(){
         //初始化第一个俄罗斯小方块
-        rand = random.nextInt(19);
-        position[0] = Tetris.initPosition[rand][0];
-        position[1] = Tetris.initPosition[rand][1];
+        randBlock = random.nextInt(19);
+        position[0] = Tetris.initPosition[randBlock][0];
+        position[1] = Tetris.initPosition[randBlock][1];
         randColor = random.nextInt(5) + 1;
 
         //设置下一个方块
-        nextRand = random.nextInt(19);
+        nextRandBlock = random.nextInt(19);
         nextRandColor = random.nextInt(5) + 1;  //随机选择一个小方块.png
     }
 
@@ -354,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
         //找到4×4方格中像素值为1的点并存储
         for (int i=0;i<4;i++) {
             for (int j=0;j<4;j++) {
-                if (((1 << j) & Tetris.shape[nextRand][i]) != 0) {
+                if (((1 << j) & Tetris.shape[nextRandBlock][i]) != 0) {
                     nextTetrisList.add(nextRandColor);
                 } else {
                     nextTetrisList.add(0);
@@ -370,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         nextTetrisList.clear();
         for (int i=0;i<4;i++) {
             for (int j=0;j<4;j++) {
-                if (((1 << j)& Tetris.shape[nextRand][i])!=0) {
+                if (((1 << j)& Tetris.shape[nextRandBlock][i])!=0) {
                     nextTetrisList.add(nextRandColor);
                 } else {
                     nextTetrisList.add(0);
@@ -423,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** 用于将方块相对于initPosition左移，否则在游戏界面中方块会向右偏移 */
     int leftMath(int a, int b) {
         if (b < 0) {
             return a >> -b;
@@ -441,10 +399,10 @@ public class MainActivity extends AppCompatActivity {
     void stopDown() {
         for(int i=3;i>=0;i--) {
             int line = i + position[1];
-            if (line >= 0 && Tetris.shape[rand][i] != 0) {
-                allBlock[line] += (leftMath(Tetris.shape[rand][i] ,position[0]));
+            if (line >= 0 && Tetris.shape[randBlock][i] != 0) {
+                allBlock[line] += (leftMath(Tetris.shape[randBlock][i] ,position[0]));
                 for (int j=0;j<xSize;j++) {
-                    if (((1 << j)& (leftMath(Tetris.shape[rand][i] ,position[0])))!=0) {
+                    if (((1 << j)& (leftMath(Tetris.shape[randBlock][i] ,position[0])))!=0) {
                         blockColor[line][j] = randColor;
                     }
                 }
@@ -479,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
         }
         initTetrisBlock();
         nextTetrisShow();
-        Log.i(TAG, rand + "");
+        Log.i(TAG, randBlock + "");
     }
 
     /** 游戏结束 */
@@ -513,5 +471,35 @@ public class MainActivity extends AppCompatActivity {
         }).create();
         dialog.setCancelable(false);
         dialog.show();
+    }
+
+    /** 方块是否可以下降一行 */
+    public boolean isCanDown(){
+        int tempPosition=position[1]+1;
+        for(int i = 3; i>=0; i--) {
+            int line = i + tempPosition;
+            if (line >= 0 && Tetris.shape[randBlock][i] != 0) {
+                //如果到底了，或者下面有方块
+                if (line >= ySize ||
+                        ((allBlock[line] & (leftMath(Tetris.shape[randBlock][i] ,position[0]))) != 0)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /** 更新游戏框内下落方块所在的格子 */
+    public void updateTetrisGameGrid(){
+        for (int i = 3; i >= 0; i--) {
+            int line = i + position[1];
+            if (line >= 0 && Tetris.shape[randBlock][i] != 0) {
+                for (int j = 0; j < xSize; j++) {
+                    if (((1 << j) & (leftMath(Tetris.shape[randBlock][i], position[0]))) != 0) {
+                        blockList.set(line * xSize + j, randColor);
+                    }
+                }
+            }
+        }
     }
 }
