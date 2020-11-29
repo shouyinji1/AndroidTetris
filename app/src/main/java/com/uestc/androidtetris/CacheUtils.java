@@ -4,7 +4,7 @@ import android.content.Context;
 
 // 一个轻量级的存储辅助类，用来保存应用的一些常用配置。最终数据是以xml形式进行存储。在应用中通常做一些简单数据的持久化缓存。
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.List;
 import java.util.Set;

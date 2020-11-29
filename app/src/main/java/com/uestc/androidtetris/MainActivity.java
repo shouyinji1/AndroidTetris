@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -283,9 +283,9 @@ public class MainActivity extends AppCompatActivity {
     private void initTetrisBlock(){
         //初始化第一个俄罗斯小方块
         randBlock = random.nextInt(19);
+        randColor = random.nextInt(5) + 1;
         position[0] = Tetris.initPosition[randBlock][0];
         position[1] = Tetris.initPosition[randBlock][1];
-        randColor = random.nextInt(5) + 1;
 
         //设置下一个方块
         nextRandBlock = random.nextInt(19);
@@ -434,7 +434,16 @@ public class MainActivity extends AppCompatActivity {
             }
             gameOver();
         }
-        initTetrisBlock();
+
+        //将下一个小方块置为当前方块
+        randBlock = nextRandBlock;
+        randColor = nextRandColor;
+        position[0] = Tetris.initPosition[randBlock][0];
+        position[1] = Tetris.initPosition[randBlock][1];
+        //设置下一个方块
+        nextRandBlock = random.nextInt(19);
+        nextRandColor = random.nextInt(5) + 1;  //随机选择一个小方块.png
+
         nextTetrisShow();
         Log.i(TAG, randBlock + "");
     }
