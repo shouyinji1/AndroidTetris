@@ -132,9 +132,8 @@ public class MainActivity extends AppCompatActivity {
             case 3: return 800;
             case 4: return 600;
             case 5: return 400;
-            default: break;
+            default: return 800;
         }
-        return timeInterval;
     }
 
     /** 从存储的数据中获取最高成绩 */
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         maxScoreTextView.setText("最高分：" + highestScore);
         scoreTextView.setText("分数："+score);
         levelTextView.setText("等级：" + grade);
-        speedTextView.setText("速度：" +1000.0 / timeInterval);
+        speedTextView.setText("速度：" +timeInterval/1000.0+"s");
         tetrisView = (GridView) findViewById(R.id.tetrisView);
         nextTetrisView = (GridView) findViewById(R.id.nextTetrisView);
         pausebtn = (Button) findViewById(R.id.pause);
