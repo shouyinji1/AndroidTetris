@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     int stop = 0;
     /** 方块数为10*15 */
     int xSize=10,ySize=15;
-    /** 所有方块用一个数组表示,记录大Grid的每一行 */
+    /** 所有位置已固定的方块用一个数组表示,记录大Grid的每一行 */
     int[] allBlock = new int[ySize];
     /** 记录大Grid的每一个方块的颜色 */
     int[][] blockColor = new int[15][10];
@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean isNewTimer=true;
 
             // 遍历大Grid中的每一个方块
             for (int i=0;i<ySize;i++) {
@@ -245,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
         downMove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int c;
                 int down=1<<10;
                 for(int i=3;i>=0;i--) {
                     int line = i + position[1];
@@ -254,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
                         for (int j=0;j<xSize;j++) {
                             if (((1 << j)& (leftMath(Tetris.shape[randBlock][i] ,position[0])))!=0) {
                                 for(int k=0;k+line<ySize;k++) {
-                                    if (blockColor[k + line][j] > 0) {
+                                    if (blockColor[k + line][j] > 0) {  // 如果在第j列第k+line检测到方块
                                         down = Math.min(down, k-1);
                                         break;
                                     }
@@ -396,6 +394,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** 写入、消除、重置 */
     void stopDown() {
+        // 记录位置已固定的方块
         for(int i=3;i>=0;i--) {
             int line = i + position[1];
             if (line >= 0 && Tetris.shape[randBlock][i] != 0) {
